@@ -9,6 +9,7 @@ import com.thinkaurelius.faunus.formats.titan.input.VertexReader;
 import com.thinkaurelius.faunus.formats.titan.util.ConfigurationUtil;
 import com.thinkaurelius.titan.diskstorage.StaticBuffer;
 import com.thinkaurelius.titan.diskstorage.keycolumnvalue.SliceQuery;
+import com.thinkaurelius.titan.diskstorage.configuration.backend.CommonsConfiguration;
 import com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration;
 import com.thinkaurelius.titan.graphdb.database.EdgeSerializer;
 import com.thinkaurelius.titan.graphdb.database.RelationReader;
@@ -31,7 +32,8 @@ public class TitanFaunusSetupImpl extends TitanFaunusSetupCommon {
     private final GraphDatabaseConfiguration graphConfig;
 
     public TitanFaunusSetupImpl(final Configuration config) {
-        BaseConfiguration titan = ConfigurationUtil.extractConfiguration(config, TitanInputFormat.FAUNUS_GRAPH_INPUT_TITAN);
+        BaseConfiguration hadoopTitan = ConfigurationUtil.extractConfiguration(config, TitanInputFormat.FAUNUS_GRAPH_INPUT_TITAN);
+        CommonsConfiguration titan = new CommonsConfiguration(hadoopTitan);
         graphConfig = new GraphDatabaseConfiguration(titan);
     }
 

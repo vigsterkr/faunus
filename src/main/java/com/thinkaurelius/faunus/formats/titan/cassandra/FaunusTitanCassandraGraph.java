@@ -4,9 +4,9 @@ import com.google.common.base.Preconditions;
 import com.thinkaurelius.faunus.FaunusVertex;
 import com.thinkaurelius.faunus.formats.titan.FaunusTitanGraph;
 import com.thinkaurelius.faunus.formats.titan.input.TitanFaunusSetup;
-import com.thinkaurelius.titan.diskstorage.keycolumnvalue.Entry;
-import com.thinkaurelius.titan.diskstorage.keycolumnvalue.StaticBufferEntry;
-import com.thinkaurelius.titan.diskstorage.util.StaticByteBuffer;
+import com.thinkaurelius.titan.diskstorage.Entry;
+import com.thinkaurelius.titan.diskstorage.util.StaticArrayEntry;
+import com.thinkaurelius.titan.diskstorage.util.StaticArrayBuffer;
 import org.apache.cassandra.db.IColumn;
 import org.apache.hadoop.conf.Configuration;
 
@@ -26,7 +26,7 @@ public class FaunusTitanCassandraGraph extends FaunusTitanGraph {
     }
 
     public FaunusVertex readFaunusVertex(final Configuration configuration, final ByteBuffer key, final SortedMap<ByteBuffer, IColumn> value) {
-        return super.readFaunusVertex(configuration, new StaticByteBuffer(key), new CassandraMapIterable(value));
+        return super.readFaunusVertex(configuration, StaticArrayBuffer.of(key), new CassandraMapIterable(value));
     }
 
     private static class CassandraMapIterable implements Iterable<Entry> {
@@ -61,7 +61,7 @@ public class FaunusTitanCassandraGraph extends FaunusTitanGraph {
         @Override
         public Entry next() {
             final Map.Entry<ByteBuffer, IColumn> entry = iterator.next();
-            return new StaticBufferEntry(new StaticByteBuffer(entry.getKey()), new StaticByteBuffer(entry.getValue().value()));
+            return StaticArrayEntry.of(StaticArrayBuffer.of(entry.getKey()), StaticArrayBuffer.of(entry.getValue().value()));
         }
 
         @Override

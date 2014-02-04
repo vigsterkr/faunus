@@ -5,6 +5,7 @@ import com.thinkaurelius.faunus.formats.TitanOutputFormatTest;
 import com.thinkaurelius.faunus.tinkerpop.gremlin.Imports;
 import com.thinkaurelius.titan.core.TitanFactory;
 import com.thinkaurelius.titan.core.TitanGraph;
+import com.thinkaurelius.titan.diskstorage.configuration.backend.CommonsConfiguration;
 import com.thinkaurelius.titan.graphdb.configuration.GraphDatabaseConfiguration;
 import org.apache.commons.configuration.BaseConfiguration;
 
@@ -19,7 +20,7 @@ public class TitanCassandraOutputFormatTest extends TitanOutputFormatTest {
         configuration.setProperty("storage.hostname", "localhost");
         configuration.setProperty("storage.cassandra-config-dir", TitanCassandraOutputFormat.class.getResource("cassandra.yaml").toString());
         configuration.setProperty("storage.db-cache", "false");
-        GraphDatabaseConfiguration graphconfig = new GraphDatabaseConfiguration(configuration);
+        GraphDatabaseConfiguration graphconfig = new GraphDatabaseConfiguration(new CommonsConfiguration(configuration));
         graphconfig.getBackend().clearStorage();
         return TitanFactory.open(configuration);
     }

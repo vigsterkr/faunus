@@ -9,11 +9,10 @@ import com.thinkaurelius.faunus.formats.titan.input.VertexReader;
 import com.thinkaurelius.faunus.formats.titan.util.ConfigurationUtil;
 import com.thinkaurelius.titan.core.Order;
 import com.thinkaurelius.titan.core.Parameter;
-import com.thinkaurelius.titan.core.attribute.FullDouble;
-import com.thinkaurelius.titan.core.attribute.FullFloat;
 import com.thinkaurelius.titan.core.attribute.Geoshape;
 import com.thinkaurelius.titan.diskstorage.StaticBuffer;
-import com.thinkaurelius.titan.diskstorage.keycolumnvalue.Entry;
+import com.thinkaurelius.titan.diskstorage.configuration.backend.CommonsConfiguration;
+import com.thinkaurelius.titan.diskstorage.Entry;
 import com.thinkaurelius.titan.graphdb.database.RelationReader;
 import com.thinkaurelius.titan.graphdb.database.idhandling.IDHandler;
 import com.thinkaurelius.titan.graphdb.relations.RelationCache;
@@ -56,7 +55,7 @@ public class TitanFaunusSetupImpl extends TitanFaunusSetupCommon {
 
     public TitanFaunusSetupImpl(final Configuration config) {
         BaseConfiguration titan = ConfigurationUtil.extractConfiguration(config, TitanInputFormat.FAUNUS_GRAPH_INPUT_TITAN);
-        graphConfig = new GraphDatabaseConfiguration(titan);
+        graphConfig = null; //new GraphDatabaseConfiguration(titan);
         graph = new StandardTitanGraph(graphConfig);
         tx = (StandardTitanTx) graph.newTransaction();
     }
@@ -103,7 +102,7 @@ public class TitanFaunusSetupImpl extends TitanFaunusSetupCommon {
         boolean[] isstatic = {typedef.isStatic(titan03.com.tinkerpop.blueprints.Direction.OUT), typedef.isStatic(titan03.com.tinkerpop.blueprints.Direction.IN)};
         definition.setValue(TypeAttributeType.UNIQUENESS, uniqueness);
         definition.setValue(TypeAttributeType.UNIQUENESS_LOCK, uniqunesslock);
-        definition.setValue(TypeAttributeType.STATIC, isstatic);
+        //definition.setValue(TypeAttributeType.STATIC, isstatic);
         definition.setValue(TypeAttributeType.SORT_KEY, typedef.getPrimaryKey());
         definition.setValue(TypeAttributeType.SIGNATURE, typedef.getSignature());
         definition.setValue(TypeAttributeType.SORT_ORDER, Order.ASC);
@@ -115,11 +114,12 @@ public class TitanFaunusSetupImpl extends TitanFaunusSetupCommon {
 
             @Override
             public RelationCache parseRelation(long vertexid, Entry entry, boolean headerOnly, TypeInspector typeInspector) {
+                /*
                 titan03.com.thinkaurelius.titan.diskstorage.util.StaticArrayBuffer column = new titan03.com.thinkaurelius.titan.diskstorage.util.StaticArrayBuffer(entry.getArrayColumn());
                 titan03.com.thinkaurelius.titan.diskstorage.util.StaticArrayBuffer value = new titan03.com.thinkaurelius.titan.diskstorage.util.StaticArrayBuffer(entry.getArrayValue());
 
                 ImmutableLongObjectMap map = graph.getEdgeSerializer().parseProperties(vertexid, titan03.com.thinkaurelius.titan.diskstorage.keycolumnvalue.StaticBufferEntry.of(column, value), headerOnly, tx);
-                titan03.com.tinkerpop.blueprints.Direction dir = map.get(DIRECTION_ID);
+                //titan03.com.tinkerpop.blueprints.Direction dir = map.get(DIRECTION_ID);
                 Direction direction;
                 switch (dir) {
                     case IN:
@@ -132,14 +132,14 @@ public class TitanFaunusSetupImpl extends TitanFaunusSetupCommon {
                         throw new IllegalArgumentException("Invalid direction found");
                 }
 
-                long typeid = map.get(TYPE_ID);
-                long relationid = map.get(RELATION_ID);
-                Object propValue = map.get(VALUE_ID);
+                //long typeid = map.get(TYPE_ID);
+                //long relationid = map.get(RELATION_ID);
+                //Object propValue = map.get(VALUE_ID);
                 if (propValue != null) { //Property
                     propValue = convertPropertyValue(propValue);
                     return new RelationCache(direction, typeid, relationid, propValue, null);
                 } else { //Edge
-                    long otherVertexId = map.get(OTHER_VERTEX_ID);
+                    //long otherVertexId = map.get(OTHER_VERTEX_ID);
                     LongObjectOpenHashMap<Object> properties = new LongObjectOpenHashMap<Object>();
                     //Add properties
                     for (int i = 0; i < map.size(); i++) {
@@ -152,8 +152,9 @@ public class TitanFaunusSetupImpl extends TitanFaunusSetupCommon {
                     }
                     return new RelationCache(direction, typeid, relationid, otherVertexId, properties);
                 }
+                */
+                return null;
             }
-
         };
     }
 
@@ -181,17 +182,17 @@ public class TitanFaunusSetupImpl extends TitanFaunusSetupCommon {
             }
             return newgeo;
         } else if (value instanceof titan03.com.thinkaurelius.titan.core.attribute.FullDouble) {
-            return new FullDouble(((titan03.com.thinkaurelius.titan.core.attribute.FullDouble) value).doubleValue());
+            return new Double(((titan03.com.thinkaurelius.titan.core.attribute.FullDouble) value).doubleValue());
         } else if (value instanceof titan03.com.thinkaurelius.titan.core.attribute.FullFloat) {
-            return new FullFloat(((titan03.com.thinkaurelius.titan.core.attribute.FullFloat) value).floatValue());
+            return new Float(((titan03.com.thinkaurelius.titan.core.attribute.FullFloat) value).floatValue());
         } else return value;
     }
 
     private static Class convertDatatype(Class clazz) {
         assert clazz != null;
         if (clazz.equals(titan03.com.thinkaurelius.titan.core.attribute.Geoshape.class)) return Geoshape.class;
-        else if (clazz.equals(titan03.com.thinkaurelius.titan.core.attribute.FullDouble.class)) return FullDouble.class;
-        else if (clazz.equals(titan03.com.thinkaurelius.titan.core.attribute.FullFloat.class)) return FullFloat.class;
+        else if (clazz.equals(titan03.com.thinkaurelius.titan.core.attribute.FullDouble.class)) return Double.class;
+        else if (clazz.equals(titan03.com.thinkaurelius.titan.core.attribute.FullFloat.class)) return Float.class;
         else return clazz;
     }
 
